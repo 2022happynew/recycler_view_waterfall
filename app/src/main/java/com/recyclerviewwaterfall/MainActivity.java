@@ -1,52 +1,80 @@
 package com.recyclerviewwaterfall;
 
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.StaggeredGridLayoutManager;
+import android.view.LayoutInflater;
 import android.view.View;
-import android.view.Menu;
-import android.view.MenuItem;
+import android.view.ViewGroup;
+import android.widget.TextView;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
+
+    private RecyclerView recyclerView;
+    private List<String> mDatas;
+    private MainAdapter mainAdapter;
+    private List<Integer> mHeights;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        setContentView(R.layout.content_main);
+        initData();
+        recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+        mainAdapter = new MainAdapter();
+        recyclerView.setAdapter(mainAdapter);
+        recyclerView.setLayoutManager(new StaggeredGridLayoutManager(3, StaggeredGridLayoutManager.VERTICAL));
+    }
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+    private void initData() {
+        mDatas = new ArrayList<>();
+        for (int i = 'A'; i < 'z'; i++) {
+            mDatas.add("" + (char) i);
+        }
+    }
+
+    class MainAdapter extends RecyclerView.Adapter<MainAdapter.MainViewHolder> {
+
+        MainAdapter() {
+            mHeights = new ArrayList<Integer>();
+            for (int i = 0; i < mDatas.size(); i++) {
+                mHeights.add((int) (100 + Math.random() * 300));
             }
-        });
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
         }
 
-        return super.onOptionsItemSelected(item);
+        @Override
+        public MainViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            MainViewHolder mainViewHolder = new MainViewHolder(LayoutInflater.from(MainActivity.this).inflate(R
+                    .layout.item_layout, parent, false));
+
+            return mainViewHolder;
+        }
+
+        @Override
+        public void onBindViewHolder(MainViewHolder holder, int position) {
+            ViewGroup.LayoutParams lp = holder.textView.getLayoutParams();
+            lp.height = mHeights.get(position);
+            holder.textView.setLayoutParams(lp);
+            holder.textView.setText(mDatas.get(position));
+        }
+
+        @Override
+        public int getItemCount() {
+            return mDatas.size();
+        }
+
+        class MainViewHolder extends RecyclerView.ViewHolder {
+
+            TextView textView;
+
+            public MainViewHolder(View itemView) {
+                super(itemView);
+                textView = (TextView) itemView.findViewById(R.id.id_num);
+            }
+        }
     }
 }
